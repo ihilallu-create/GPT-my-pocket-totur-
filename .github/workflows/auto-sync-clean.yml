@@ -13,20 +13,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. نسخ المستودع الأول (emergent-github-gpt) - للقراءة فقط
+      # 1. نسخ المستودع الأول (emergent-github-gpt) - خاص (يحتاج توكن)
       - name: Checkout emergent-github-gpt
         uses: actions/checkout@v3
         with:
           repository: ihilallu-create/emergent-github-gpt
-          ref: main   # ✅ أضفنا تحديد الفرع
+          ref: main
           path: emergent
+          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}  # ✅ أضفنا التوكن هنا
 
-      # 2. نسخ المستودع الثاني (gpt-pocket-totur-learn) - للكتابة والتخزين
+      # 2. نسخ المستودع الثاني (gpt-pocket-totur-learn) - للتطوير والتخزين
       - name: Checkout gpt-pocket-totur-learn
         uses: actions/checkout@v3
         with:
           repository: ihilallu-create/gpt-pocket-totur-learn
-          ref: main   # ✅ أضفنا تحديد الفرع
+          ref: main
           path: pocket
           token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
 
