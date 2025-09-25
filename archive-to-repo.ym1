@@ -1,0 +1,43 @@
+name: Archive Conversations to Repo2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v3
+        with:
+          repository: ihilallu-create/App-GPT-EMERGENT
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Copy data to repo2
+        run: |
+          mkdir -p repo2
+          cp -r conversations repo2/
+          cp -r research repo2/
+          cp -r logs repo2/
+          cp -r attachments repo2/
+          cp -r index repo2/
+
+      - name: Push to Repo2
+        uses: actions/checkout@v3
+        with:
+          repository: ihilallu-create/GPT-my-pocket-totur-learn
+          token: ${{ secrets.REPO2_TOKEN }}
+          path: repo2
+
+      - name: Commit and Push changes
+        run: |
+          cd repo2
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Auto-archive conversations, research, and files"
+          git push origin main
