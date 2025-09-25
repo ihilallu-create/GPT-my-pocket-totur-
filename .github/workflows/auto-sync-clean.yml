@@ -18,8 +18,8 @@ jobs:
         with:
           repository: ihilallu-create/emergent-github-gpt
           ref: main
-          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
           path: emergent
+          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
 
       # 2. Checkout gpt-pocket-totur-learn
       - name: Checkout gpt-pocket-totur-learn
@@ -27,10 +27,14 @@ jobs:
         with:
           repository: ihilallu-create/gpt-pocket-totur-learn
           ref: main
-          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
           path: pocket
+          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
 
-      # 3. Sync files (استثناء الملفات المهمة)
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: pip install openai
+
+      # 4. Sync files (استثناء الملفات اللي ما نريدها تنمسح)
       - name: Sync files
         run: |
           rsync -av --delete emergent/ pocket/ \
@@ -40,20 +44,15 @@ jobs:
             --exclude 'input.txt' \
             --exclude 'analysis_results.md'
 
-      # 4. Install dependencies
-      - name: Install dependencies
-        run: |
-          pip install openai
-
       # 5. Run GPT Connector
       - name: Run GPT Connector
         run: |
           cd pocket
           python gpt_connector.py
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
 
-      # 6. Commit + Push changes
+      # 6. Commit and Push changes
       - name: Commit and Push changes
         run: |
           cd pocket
