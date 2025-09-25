@@ -11,18 +11,17 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. نسخ المستودع الأول (emergent-github-gpt) - خاص (يحتاج توكن)
+      # 1. نسخ المستودع الأول (emergent-github-gpt)
       - name: Checkout emergent-github-gpt
         uses: actions/checkout@v3
         with:
           repository: ihilallu-create/emergent-github-gpt
           ref: main
           path: emergent
-          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}  # ✅ أضفنا التوكن هنا
+          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
 
-      # 2. نسخ المستودع الثاني (gpt-pocket-totur-learn) - للتطوير والتخزين
+      # 2. نسخ المستودع الثاني (gpt-pocket-totur-learn)
       - name: Checkout gpt-pocket-totur-learn
         uses: actions/checkout@v3
         with:
@@ -31,12 +30,15 @@ jobs:
           path: pocket
           token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
 
-      # 3. عمل مزامنة للملفات
+      # 3. مزامنة الملفات مع استثناء الملفات الخاصة
       - name: Sync files
         run: |
           rsync -av --delete emergent/ pocket/ \
-          --exclude '.git/' \
-          --exclude '.github/workflows/'
+            --exclude '.git/' \
+            --exclude '.github/workflows/' \
+            --exclude 'gpt_connector.py' \
+            --exclude 'input.txt' \
+            --exclude 'analysis_results.md'
 
       # 4. Commit + Pull + Push
       - name: Commit and Push changes
