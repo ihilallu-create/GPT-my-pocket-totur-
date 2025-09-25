@@ -5,14 +5,14 @@ on:
     branches:
       - main
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */6 * * *"   # كل 6 ساعات
   workflow_dispatch:
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout emergent-github-gpt
+      # 1. نسخ المستودع الأول (emergent-github-gpt)
       - name: Checkout emergent-github-gpt
         uses: actions/checkout@v3
         with:
@@ -21,7 +21,7 @@ jobs:
           path: emergent
           token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
 
-      # 2. Checkout gpt-pocket-totur-learn
+      # 2. نسخ المستودع الثاني (gpt-pocket-totur-learn)
       - name: Checkout gpt-pocket-totur-learn
         uses: actions/checkout@v3
         with:
@@ -30,11 +30,12 @@ jobs:
           path: pocket
           token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
 
-      # 3. Install dependencies
+      # 3. تثبيت المكتبات المطلوبة
       - name: Install dependencies
-        run: pip install openai
+        run: |
+          pip install openai
 
-      # 4. Sync files (استثناء الملفات اللي ما نريدها تنمسح)
+      # 4. مزامنة الملفات (مع استثناء الملفات المهمة)
       - name: Sync files
         run: |
           rsync -av --delete emergent/ pocket/ \
@@ -44,15 +45,15 @@ jobs:
             --exclude 'input.txt' \
             --exclude 'analysis_results.md'
 
-      # 5. Run GPT Connector
+      # 5. تشغيل كود GPT Connector
       - name: Run GPT Connector
         run: |
           cd pocket
           python gpt_connector.py
         env:
-          OPENAI_API_KEY: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      # 6. Commit and Push changes
+      # 6. Commit + Push التغييرات
       - name: Commit and Push changes
         run: |
           cd pocket
