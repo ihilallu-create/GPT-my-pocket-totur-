@@ -40,6 +40,14 @@ jobs:
             --exclude 'input.txt' \
             --exclude 'analysis_results.md'
 
+      # 3.5 تشغيل سكربت GPT Connector
+      - name: Run GPT Connector
+        run: |
+          cd pocket
+          python gpt_connector.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
       # 4. Commit + Pull + Push
       - name: Commit and Push changes
         run: |
@@ -47,6 +55,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Auto-sync from emergent-github-gpt" || echo "No changes to commit"
+          git commit -m "Auto-sync and run GPT connector" || echo "No changes to commit"
           git pull --rebase origin main
           git push origin main
