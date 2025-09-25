@@ -1,0 +1,16 @@
+name: OpenAI smoke test
+on: workflow_dispatch
+
+jobs:
+  call-openai:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping OpenAI models endpoint
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}\n" \
+            https://api.openai.com/v1/models \
+            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}")
+          if [ "$code" != "200" ]; then
+            echo "OpenAI API failed with HTTP $code"; exit 1
+          fi
+          echo "OK"
