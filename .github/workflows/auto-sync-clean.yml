@@ -11,50 +11,49 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. نسخ المستودع الأول (emergent-github-gpt)
+      # 1. Checkout emergent-github-gpt
       - name: Checkout emergent-github-gpt
         uses: actions/checkout@v3
         with:
           repository: ihilallu-create/emergent-github-gpt
           ref: main
-          token: ${{ secrets.GH_PAT }}   # ← استخدم PAT بدل المفتاح العادي
+          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
           path: emergent
 
-      # 2. نسخ المستودع الثاني (gpt-pocket-totur-learn)
+      # 2. Checkout gpt-pocket-totur-learn
       - name: Checkout gpt-pocket-totur-learn
         uses: actions/checkout@v3
         with:
           repository: ihilallu-create/gpt-pocket-totur-learn
           ref: main
-          token: ${{ secrets.GH_PAT }}   # ← نفس الشي هنا
+          token: ${{ secrets.GPT_GITHUB_POCKET_TOTUR_KEY }}
           path: pocket
 
-      # 3. تثبيت المكتبات المطلوبة
+      # 3. Sync files (استثناء الملفات المهمة)
+      - name: Sync files
+        run: |
+          rsync -av --delete emergent/ pocket/ \
+            --exclude '.git/' \
+            --exclude '.github/workflows/' \
+            --exclude 'gpt_connector.py' \
+            --exclude 'input.txt' \
+            --exclude 'analysis_results.md'
+
+      # 4. Install dependencies
       - name: Install dependencies
         run: |
           pip install openai
 
-      # 4. مزامنة الملفات مع استثناء ملفاتنا الخاصة
-      - name: Sync files
-        run: |
-          rsync -av --delete emergent/ pocket/ \
-          --exclude '.git/' \
-          --exclude '.github/workflows/' \
-          --exclude 'gpt_connector.py' \
-          --exclude 'input.txt' \
-          --exclude 'analysis_results.md'
-
-      # 5. تشغيل سكربت GPT Connector
+      # 5. Run GPT Connector
       - name: Run GPT Connector
         run: |
           cd pocket
           python gpt_connector.py
         env:
-          OPENAI_API_KEY: ${{ secrets.GPT_POCKET_TOTUR_KEY }}   # ← عدلنا الاسم هنا
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      # 6. Commit + Push
+      # 6. Commit + Push changes
       - name: Commit and Push changes
         run: |
           cd pocket
